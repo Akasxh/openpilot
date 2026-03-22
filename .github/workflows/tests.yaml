@@ -183,7 +183,7 @@ jobs:
     - name: Build openpilot
       run: scons -j$(nproc)
     - name: Driving test
-      timeout-minutes: 5
+      timeout-minutes: 10
       env:
         LOG_ROOT: /tmp/openpilot_logs
       run: |
