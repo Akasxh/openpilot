@@ -189,7 +189,7 @@ jobs:
       run: |
         mkdir -p $LOG_ROOT
         source selfdrive/test/setup_xvfb.sh
-        pytest -s tools/sim/tests/test_metadrive_bridge.py --test_duration 15
+        pytest -s -n 0 tools/sim/tests/test_metadrive_bridge.py --test_duration 15
     - name: Upload sim logs
       if: always()
       uses: actions/upload-artifact@v4
