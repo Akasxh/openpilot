@@ -47,7 +47,11 @@ class TestSimBridgeBase:
       sm.update()
 
       not_running = [p.name for p in sm['managerState'].processes if not p.running and p.shouldBeRunning]
-      car_event_issues = [event.name for event in sm['onroadEvents'] if any([event.noEntry, event.softDisable, event.immediateDisable])]
+      # locationdTemporaryError is expected in sim environments without real GPS
+      ignored_events = {"locationdTemporaryError"}
+      car_event_issues = [event.name for event in sm['onroadEvents']
+                          if any([event.noEntry, event.softDisable, event.immediateDisable])
+                          and event.name not in ignored_events]
 
       if sm.all_alive() and len(car_event_issues) == 0 and len(not_running) == 0:
         no_car_events_issues_once = True
