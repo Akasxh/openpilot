@@ -174,13 +174,7 @@ jobs:
 
   simulator_driving:
     name: simulator driving
-    runs-on: ${{
-      (github.repository == 'commaai/openpilot') &&
-      ((github.event_name != 'pull_request') ||
-      (github.event.pull_request.head.repo.full_name == 'commaai/openpilot'))
-      && fromJSON('["namespace-profile-amd64-8x16"]')
-      || fromJSON('["ubuntu-24.04"]') }}
-    if: false  # FIXME: Started to timeout recently
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v6
       with:
@@ -189,10 +183,21 @@ jobs:
     - name: Build openpilot
       run: scons -j$(nproc)
     - name: Driving test
-      timeout-minutes: 2
+      timeout-minutes: 5
+      env:
+        LOG_ROOT: /tmp/openpilot_logs
       run: |
+        mkdir -p $LOG_ROOT
         source selfdrive/test/setup_xvfb.sh
-        pytest -s tools/sim/tests/test_metadrive_bridge.py
+        pytest -s tools/sim/tests/test_metadrive_bridge.py --test_duration 15
+    - name: Upload sim logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: simulator-logs
+        path: |
+          /tmp/openpilot_logs/
+          ~/.comma/media/0/realdata/
 
   create_ui_report:
     name: Create UI Report
